@@ -4,10 +4,10 @@ use std::io::{self, prelude::*, BufReader};
 
 fn main() -> io::Result<()> {
     let part1_total = first_last_digit_total("./data/input.txt");
-    println!("Day1, Part One: {part1_total}"); // Answer part 1: 53921
+    println!("Day1, Part One: {part1_total}");
 
     let part2_total = first_last_spelled_total("./data/input.txt");
-    println!("Day1, Part Two: {part2_total}"); // Answer part 2: 54676
+    println!("Day1, Part Two: {part2_total}");
     Ok(())
 }
 
@@ -40,38 +40,45 @@ fn first_last_spelled_total(filepath: &str) -> i64 {
     total
 }
 
+/// If `sub_line` slice starts with a spelled digit, return the corresponding digit as a string,
+/// otherwise return None.
+fn scan_first_spelled_digit(sub_line: &str, numbers: &HashMap<&str, &str>) -> Option<String> {
+    if sub_line.len()>= 3 {
+        if let Some(&s) = numbers.get(&sub_line[..3]) { return Some(s.to_string()) }
+    }
+    if sub_line.len()>= 4 {
+        if let Some(&s) = numbers.get(&sub_line[..4]) { return Some(s.to_string()) }
+    }
+    if sub_line.len()>= 5 {
+        if let Some(&s) = numbers.get(&sub_line[..5]) { return Some(s.to_string()) }
+    }
+    None
+}
+
+/// If `sub_line` slice starts with a digit, return it as a string, otherwise return None.
+fn scan_first_digit(sub_line: &str) -> Option<String> {
+    if sub_line.chars().next().unwrap().is_ascii_digit() {
+        return Some(sub_line.chars().next().unwrap().to_string());
+    }
+    None
+}
+
+/// Return the first occurring digit in `line`. The digit can be an ascii digit, _e.g._ '1', '2',
+/// or spelled out, _e.g._ 'one', 'two'. If no digit can be parsed, return the empty string.
 fn first_spelled_digit(line: &str, numbers: &HashMap<&str, &str>) -> String {
     for i in 0..line.len() {
-        if line.chars().nth(i).unwrap().is_ascii_digit() {
-            return line.chars().nth(i).unwrap().to_string();
-        }
-        if i + 3 <= line.len() {
-            if let Some(&s) = numbers.get(&line[i..i+3]) { return s.to_string() }
-        }
-        if i + 4 <= line.len() {
-            if let Some(&s) = numbers.get(&line[i..i+4]) { return s.to_string() }
-        }
-        if i + 5 <= line.len() {
-            if let Some(&s) = numbers.get(&line[i..i+5]) { return s.to_string() }
-        }
+        if let Some(d) = scan_first_digit(&line[i..]) { return d }
+        if let Some(d) = scan_first_spelled_digit(&line[i..], numbers) { return d }
     }
     "".to_string()
 }
 
+/// Return the last occurring digit in `line`. The digit can be an ascii digit, _e.g._ '1', '2',
+/// or spelled out, _e.g._ 'one', 'two'. If no digit can be parsed, return the empty string.
 fn last_spelled_digit(line: &str, numbers: &HashMap<&str, &str>) -> String {
     for i in (0..line.len()).rev() {
-        if line.chars().nth(i).unwrap().is_ascii_digit() {
-            return line.chars().nth(i).unwrap().to_string();
-        }
-        if i + 3 <= line.len() {
-            if let Some(&s) = numbers.get(&line[i..i+3]) { return s.to_string() }
-        }
-        if i + 4 <= line.len() {
-            if let Some(&s) = numbers.get(&line[i..i+4]) { return s.to_string() }
-        }
-        if i + 5 <= line.len() {
-            if let Some(&s) = numbers.get(&line[i..i+5]) { return s.to_string() }
-        }
+        if let Some(d) = scan_first_digit(&line[i..]) { return d }
+        if let Some(d) = scan_first_spelled_digit(&line[i..], numbers) { return d }
     }
     "".to_string()
 }
@@ -90,6 +97,7 @@ fn first_last_digit_total(filepath: &str) -> i64 {
     total
 }
 
+/// Return the first occurring ascii digit in `s` as a string, or empty string if no digit if found.
 fn first_digit(s: &str) -> String {
     for char in s.chars() {
         if char.is_ascii_digit() {
@@ -99,6 +107,7 @@ fn first_digit(s: &str) -> String {
     "".to_string()
 }
 
+/// Return the last occurring ascii digit in `s` as a string, or empty string if no digit if found.
 fn last_digit(s: &str) -> String {
     for char in s.chars().rev() {
         if char.is_ascii_digit() {
@@ -132,13 +141,23 @@ mod tests {
     }
 
     #[test]
-    fn part1_total() {
+    fn part1_total_sample() {
         assert_eq!(first_last_digit_total("./data/test_part1.txt"), 142);
     }
 
     #[test]
-    fn part2_total() {
+    fn part1_total_final() {
+        assert_eq!(first_last_digit_total("./data/input.txt"), 53921);
+    }
+
+    #[test]
+    fn part2_total_sample() {
         assert_eq!(first_last_spelled_total("./data/test_part2.txt"), 281);
+    }
+
+    #[test]
+    fn part2_total_final() {
+        assert_eq!(first_last_spelled_total("./data/input.txt"), 54676);
     }
 
     #[test]
