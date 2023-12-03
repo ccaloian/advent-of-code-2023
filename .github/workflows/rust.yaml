@@ -19,4 +19,4 @@ jobs:
     - name: Build
       run: cargo build --manifest-path aoc23/Cargo.toml --workspace --verbose
     - name: Run tests
-      run: cargo test cargo test --manifest-path aoc23/Cargo.toml --workspace s--verbose
+      run: cargo test --manifest-path aoc23/Cargo.toml --workspace s--verbose
