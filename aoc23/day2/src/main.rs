@@ -4,10 +4,10 @@ use std::io::{BufRead, BufReader};
 
 fn main() {
     let part1_total = get_possible_games_sum("./data/input.txt");
-    println!("Day1, Part One: {part1_total}");
+    println!("Day2, Part One: {part1_total}");
 
     let part2_total = get_sum_of_powers("./data/input.txt");
-    println!("Day1, Part Two: {part2_total}");
+    println!("Day2, Part Two: {part2_total}");
 }
 
 #[derive(Debug, PartialEq)]
