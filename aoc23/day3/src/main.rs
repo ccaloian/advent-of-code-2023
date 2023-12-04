@@ -6,8 +6,12 @@ use std::io::{BufRead, BufReader};
 fn main() {
     // let (nums, syms) = scan_file("./data/input.txt");
     let (nums, syms) = scan_file("./data/input.txt");
+
     let sum = sum_part_nums(&nums, &syms);
     println!("Day 3, Part 1: {}", sum);
+
+    let sum_gears = sum_gear_ratios(&nums, &syms);
+    println!("Day 3, Part 2: {}", sum_gears);
 }
 
 fn scan_file(filepath: &str) -> (Vec<Number>, Vec<Symbol>) {
@@ -77,6 +81,23 @@ fn sum_part_nums(numbers: &[Number], symbols: &[Symbol]) -> u64 {
         .filter(|num| symbols.iter().any(|sym| num.adjacent(sym)))
         .map(|num| num.val)
         .sum()
+}
+
+fn sum_gear_ratios(numbers: &[Number], symbols: &[Symbol]) -> u64 {
+    let mut total = 0;
+    symbols.iter().for_each(|s| {
+        if s.val == '*' {
+            let part_nums = numbers
+                .iter()
+                .filter(|n| n.adjacent(s))
+                .map(|n| n.val)
+                .collect::<Vec<u64>>();
+            if part_nums.len() == 2 {
+                total += part_nums.get(0).unwrap() * part_nums.get(1).unwrap();
+            }
+        }
+    });
+    total
 }
 
 #[derive(Debug, PartialEq)]
@@ -283,5 +304,26 @@ mod tests {
         let (nums, syms) = scan_file("./data/input.txt");
         let sum = sum_part_nums(&nums, &syms);
         assert_eq!(sum, 532428);
+    }
+
+    #[test]
+    fn part2_total_sample() {
+        let (nums, syms) = scan_file("./data/test_part1.txt");
+        let sum = sum_gear_ratios(&nums, &syms);
+        assert_eq!(sum, 467835);
+    }
+
+    #[test]
+    fn part2_total_sample_modified() {
+        let (nums, syms) = scan_file("./data/test_part1.txt");
+        let sum = sum_gear_ratios(&nums, &syms);
+        assert_eq!(sum, 467835);
+    }
+
+    #[test]
+    fn part2_total_final() {
+        let (nums, syms) = scan_file("./data/input.txt");
+        let sum = sum_gear_ratios(&nums, &syms);
+        assert_eq!(sum, 84051670);
     }
 }
