@@ -6,6 +6,21 @@ fn main() {
     let cards = scan("./data/input.txt");
     let sum = sum_winning_points(&cards);
     println!("Day 4, Part 1: {}", sum);
+
+    let total = total_scratchcards(&cards);
+    println!("Day 4, Part 2: {}", total);
+}
+
+fn total_scratchcards(cards: &[Card]) -> u64 {
+    let mut card_copies: Vec<u64> = vec![1; cards.len()];
+    let mut total = 0;
+    for (i, curr_card) in cards.iter().enumerate() {
+        for j in (i + 1)..(i + curr_card.matching as usize + 1) {
+            card_copies[j] += card_copies[i];
+        }
+        total += card_copies[i];
+    }
+    total
 }
 
 fn sum_winning_points(cards: &[Card]) -> u64 {
@@ -151,5 +166,19 @@ mod tests {
         let cards = scan("./data/input.txt");
         let sum = sum_winning_points(&cards);
         assert_eq!(sum, 24160);
+    }
+
+    #[test]
+    fn part2_total_sample() {
+        let cards = scan("./data/test_part1.txt");
+        let total = total_scratchcards(&cards);
+        assert_eq!(total, 30);
+    }
+
+    #[test]
+    fn part2_total_final() {
+        let cards = scan("./data/input.txt");
+        let total = total_scratchcards(&cards);
+        assert_eq!(total, 5659035);
     }
 }
