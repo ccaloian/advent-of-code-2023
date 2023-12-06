@@ -1,45 +1,27 @@
+use std::cmp::{max, min};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::ops::Range;
 use std::path::Path;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 fn main() {
     let start = Instant::now();
+
     let (seeds, maps) = read_data("./data/input.txt");
-    let min_loc = find_min_location(seeds, &maps);
-    let duration_1 = start.elapsed();
-    println!("Day 4, Part 1: {}", min_loc);
-    println!("Time elapsed in find_min_location() is: {:?}", duration_1);
+    let min_loc = find_min_location(&seeds, &maps);
+    println!("Day 5, Part 1: {}", min_loc);
+
+    let seed_ranges = get_seed_ranges(&seeds);
+    let min_loc_with_ranges = find_min_location_with_ranges(seed_ranges, &maps);
+    println!("Day 5, Part 2: {}", min_loc_with_ranges);
+
+    let duration = start.elapsed();
+    println!("Time elapsed in find_min_location() is: {:?}", duration);
 }
 
 type RangeMap = HashMap<Range<u64>, Range<u64>>;
-
-#[derive(Debug)]
-struct Maps {
-    seed_to_soil: RangeMap,
-    soil_to_fert: RangeMap,
-    fert_to_water: RangeMap,
-    water_to_light: RangeMap,
-    light_to_temp: RangeMap,
-    temp_to_humid: RangeMap,
-    humid_to_loc: RangeMap,
-}
-
-impl Maps {
-    fn get_soil(&self, seed: u64) -> u64 {
-        let seed_ranges: Vec<(&Range<u64>, &Range<u64>)> = self
-            .seed_to_soil
-            .iter()
-            .filter(|(k, _)| k.contains(&seed))
-            .collect();
-        assert_eq!(seed_ranges.len(), 1);
-        let (seed_range, soil_range) = seed_ranges[0];
-        let seek = seed - seed_range.start;
-        soil_range.start + seek
-    }
-}
 
 fn get_mapped_id(id: u64, name: &str, maps: &HashMap<&str, RangeMap>) -> u64 {
     let src_ranges: Vec<(&Range<u64>, &Range<u64>)> =
@@ -63,8 +45,106 @@ fn seed_location(seed_id: u64, maps: &HashMap<&str, RangeMap>) -> u64 {
     loc_id
 }
 
-fn find_min_location(seeds: Vec<u64>, maps: &HashMap<&str, RangeMap>) -> u64 {
+fn find_min_location(seeds: &[u64], maps: &HashMap<&str, RangeMap>) -> u64 {
     seeds.iter().map(|s| seed_location(*s, maps)).min().unwrap()
+}
+
+fn get_seed_ranges(seeds: &[u64]) -> Vec<Range<u64>> {
+    let mut seed_ranges: Vec<Range<u64>> = Vec::new();
+    assert_eq!(seeds.len() % 2, 0);
+    for i in (0..seeds.len()).step_by(2) {
+        seed_ranges.push(Range {
+            start: seeds[i],
+            end: seeds[i] + seeds[i + 1],
+        })
+    }
+    seed_ranges
+}
+
+fn find_min_location_for_range(seed_range: Range<u64>, maps: &HashMap<&str, RangeMap>) -> u64 {
+    seed_range.map(|s| seed_location(s, maps)).min().unwrap()
+}
+
+fn find_min_location_with_ranges(
+    seed_ranges: Vec<Range<u64>>,
+    maps: &HashMap<&str, RangeMap>,
+) -> u64 {
+    seed_ranges
+        .into_iter()
+        .map(|r| find_min_location_for_range(r, maps))
+        .min()
+        .unwrap()
+}
+
+fn overlap(src: &Range<u64>, dst: &Range<u64>) -> bool {
+    (src.start <= dst.end) && (src.end >= dst.start)
+}
+
+/// Return a tuple (src_left, src_overlap, src_right).
+fn extract_overlap(
+    src: &Range<u64>,
+    dst: &Range<u64>,
+) -> (Option<Range<u64>>, Range<u64>, Option<Range<u64>>) {
+    let mut src_left = None;
+    let mut src_right = None;
+    let overlap = Range {
+        start: max(src.start, dst.start),
+        end: min(src.end, dst.end),
+    };
+
+    if src.start < dst.start {
+        src_left = Some(Range {
+            start: src.start,
+            end: dst.start,
+        });
+    }
+
+    if src.end > dst.end {
+        src_right = Some(Range {
+            start: dst.end,
+            end: src.end,
+        });
+    }
+
+    (src_left, overlap, src_right)
+}
+
+fn get_one_to_one_ranges(src: &[Range<u64>], dst: &[Range<u64>]) -> RangeMap {
+    let mut src_clone = src.clone();
+    let mut one_to_one: RangeMap = HashMap::new();
+    src_clone.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
+
+    // Add one_to_one ranges that map 1-1
+    for i in 0..src_clone.len() - 1 {
+        one_to_one.insert(
+            Range {
+                start: src_clone[i].end,
+                end: src_clone[i + 1].start,
+            },
+            Range {
+                start: src_clone[i].end,
+                end: src_clone[i + 1].start,
+            },
+        );
+    }
+
+    one_to_one
+}
+
+fn complete_map_ranges(rmap: RangeMap) -> RangeMap {
+    let src = rmap.keys().cloned().collect::<Vec<Range<u64>>>();
+    let dst = rmap.values().cloned().collect::<Vec<Range<u64>>>();
+
+    let mut complete: RangeMap = get_one_to_one_ranges(&src, &dst);
+    let _ = rmap.into_iter().map(|(s, d)| complete.insert(s, d));
+
+    complete
+}
+
+fn map_input_to_seeds(inputs: Vec<Range<u64>>, seeds: Vec<Range<u64>>) -> Vec<Range<u64>> {
+    // filter seed ranges by inputs (to further filter soil ranges,..., to filter locations)
+    let seed_ranges: Vec<Range<u64>> = Vec::new();
+    seed_ranges
 }
 
 fn read_data(filepath: &str) -> (Vec<u64>, HashMap<&str, RangeMap>) {
@@ -135,16 +215,6 @@ fn read_data(filepath: &str) -> (Vec<u64>, HashMap<&str, RangeMap>) {
         };
     }
 
-    // let maps = Maps {
-    //     seed_to_soil,
-    //     soil_to_fert,
-    //     fert_to_water,
-    //     water_to_light,
-    //     light_to_temp,
-    //     temp_to_humid,
-    //     humid_to_loc,
-    // };
-
     let mut maps: HashMap<&str, RangeMap> = HashMap::new();
     maps.insert("seed-to-soil", seed_to_soil);
     maps.insert("soil-to-fertilizer", soil_to_fert);
@@ -192,6 +262,33 @@ mod tests {
     #[test]
     fn part1_min_location() {
         let (seeds, maps) = read_data("./data/test_part1.txt");
-        assert_eq!(find_min_location(seeds, &maps), 35);
+        assert_eq!(find_min_location(&seeds, &maps), 35);
+    }
+
+    #[test]
+    fn part2_seed_ranges() {
+        let (seeds, _) = read_data("./data/test_part1.txt");
+        let seed_ranges = get_seed_ranges(&seeds);
+        assert_eq!(
+            seed_ranges,
+            vec![
+                Range {
+                    start: 79,
+                    end: 79 + 14
+                },
+                Range {
+                    start: 55,
+                    end: 55 + 13
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn part2_min_location() {
+        let (seeds, maps) = read_data("./data/test_part2.txt");
+        let seed_ranges = get_seed_ranges(&seeds);
+        let min_loc_with_ranges = find_min_location_with_ranges(seed_ranges, &maps);
+        assert_eq!(min_loc_with_ranges, 46);
     }
 }
