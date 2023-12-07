@@ -2,7 +2,7 @@ use std::cmp::{max, min};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::ops::Range;
+use std::ops::{Range, RangeTo};
 use std::path::Path;
 use std::time::Instant;
 
@@ -13,9 +13,9 @@ fn main() {
     let min_loc = find_min_location(&seeds, &maps);
     println!("Day 5, Part 1: {}", min_loc);
 
-    let seed_ranges = get_seed_ranges(&seeds);
-    let min_loc_with_ranges = find_min_location_with_ranges(seed_ranges, &maps);
-    println!("Day 5, Part 2: {}", min_loc_with_ranges);
+    // let seed_ranges = get_seed_ranges(&seeds);
+    // let min_loc_with_ranges = find_min_location_with_ranges(seed_ranges, &maps);
+    // println!("Day 5, Part 2: {}", min_loc_with_ranges);
 
     let duration = start.elapsed();
     println!("Time elapsed in find_min_location() is: {:?}", duration);
@@ -61,37 +61,56 @@ fn get_seed_ranges(seeds: &[u64]) -> Vec<Range<u64>> {
     seed_ranges
 }
 
-fn find_min_location_for_range(seed_range: Range<u64>, maps: &HashMap<&str, RangeMap>) -> u64 {
-    seed_range.map(|s| seed_location(s, maps)).min().unwrap()
+fn get_max_seed_id(seeds: &[Range<u64>]) -> u64 {
+    seeds.iter().map(|s| s.end).max().unwrap()
 }
 
-fn find_min_location_with_ranges(
-    seed_ranges: Vec<Range<u64>>,
-    maps: &HashMap<&str, RangeMap>,
-) -> u64 {
-    seed_ranges
-        .into_iter()
-        .map(|r| find_min_location_for_range(r, maps))
-        .min()
-        .unwrap()
+fn filter_seed_ranges_by_input(
+    input_ranges: &[Range<u64>],
+    seed_ranges: &[Range<u64>],
+) -> Vec<Range<u64>> {
+    // let mut ranges_filt: Vec<Range<u64>> = Vec::new();
+    let ranges_filt = input_ranges.iter().flat_map(|src| {
+        seed_ranges
+            .iter()
+            .filter(|dst| overlap(src, dst))
+            .map(|dst| Range {
+                start: max(src.start, dst.start),
+                end: min(src.end, dst.end),
+            })
+            .collect::<Vec<Range<u64>>>()
+    });
+    ranges_filt.collect()
 }
+
+// fn find_min_location_for_range(seed_range: Range<u64>, maps: &HashMap<&str, RangeMap>) -> u64 {
+//     seed_range.map(|s| seed_location(s, maps)).min().unwrap()
+// }
+
+// fn find_min_location_with_ranges(
+//     seed_ranges: Vec<Range<u64>>,
+//     maps: &HashMap<&str, RangeMap>,
+// ) -> u64 {
+//     seed_ranges
+//         .into_iter()
+//         .map(|r| find_min_location_for_range(r, maps))
+//         .min()
+//         .unwrap()
+// }
 
 fn overlap(src: &Range<u64>, dst: &Range<u64>) -> bool {
     (src.start <= dst.end) && (src.end >= dst.start)
 }
 
 /// Return a tuple (src_left, src_overlap, src_right).
-fn extract_overlap(
-    src: &Range<u64>,
-    dst: &Range<u64>,
-) -> (Option<Range<u64>>, Range<u64>, Option<Range<u64>>) {
-    let mut src_left = None;
-    let mut src_right = None;
+fn extract_overlap(src: &Range<u64>, dst: &Range<u64>) -> Range<u64> {
+    // ) -> (Option<Range<u64>>, Range<u64>, Option<Range<u64>>) {
     let overlap = Range {
         start: max(src.start, dst.start),
         end: min(src.end, dst.end),
     };
 
+    let mut src_left = None;
     if src.start < dst.start {
         src_left = Some(Range {
             start: src.start,
@@ -99,6 +118,7 @@ fn extract_overlap(
         });
     }
 
+    let mut src_right = None;
     if src.end > dst.end {
         src_right = Some(Range {
             start: dst.end,
@@ -106,13 +126,17 @@ fn extract_overlap(
         });
     }
 
-    (src_left, overlap, src_right)
+    // (src_left, overlap, src_right)
+    overlap
 }
 
-fn get_one_to_one_ranges(src: &[Range<u64>], dst: &[Range<u64>]) -> RangeMap {
-    let mut src_clone = src.clone();
+fn get_one_to_one_ranges(src: &[Range<u64>], dst: &[Range<u64>], range_end: u64) -> RangeMap {
+    let mut src_clone = src.iter().map(|s| s.clone()).collect::<Vec<Range<u64>>>();
+    let mut dst_clone = dst.iter().map(|d| d.clone()).collect::<Vec<Range<u64>>>();
+
     let mut one_to_one: RangeMap = HashMap::new();
     src_clone.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
+    dst_clone.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
 
     // Add one_to_one ranges that map 1-1
     for i in 0..src_clone.len() - 1 {
@@ -122,8 +146,36 @@ fn get_one_to_one_ranges(src: &[Range<u64>], dst: &[Range<u64>]) -> RangeMap {
                 end: src_clone[i + 1].start,
             },
             Range {
-                start: src_clone[i].end,
-                end: src_clone[i + 1].start,
+                start: dst_clone[i].end,
+                end: dst_clone[i + 1].start,
+            },
+        );
+    }
+
+    // Add 1-1 range from 0 to the start of the first interval
+    if src_clone[0].start > 0 {
+        one_to_one.insert(
+            Range {
+                start: 0,
+                end: src_clone[0].start,
+            },
+            Range {
+                start: 0,
+                end: dst_clone[0].start,
+            },
+        );
+    }
+
+    // Add 1-1 range from the end of the last interval until range_end
+    if src_clone.last().unwrap().end < range_end {
+        one_to_one.insert(
+            Range {
+                start: src_clone.last().unwrap().end,
+                end: range_end,
+            },
+            Range {
+                start: dst_clone.last().unwrap().end,
+                end: range_end,
             },
         );
     }
@@ -131,11 +183,11 @@ fn get_one_to_one_ranges(src: &[Range<u64>], dst: &[Range<u64>]) -> RangeMap {
     one_to_one
 }
 
-fn complete_map_ranges(rmap: RangeMap) -> RangeMap {
+fn complete_map_ranges(rmap: RangeMap, max_range: u64) -> RangeMap {
     let src = rmap.keys().cloned().collect::<Vec<Range<u64>>>();
     let dst = rmap.values().cloned().collect::<Vec<Range<u64>>>();
 
-    let mut complete: RangeMap = get_one_to_one_ranges(&src, &dst);
+    let mut complete: RangeMap = get_one_to_one_ranges(&src, &dst, max_range);
     let _ = rmap.into_iter().map(|(s, d)| complete.insert(s, d));
 
     complete
@@ -284,11 +336,45 @@ mod tests {
         );
     }
 
+    // #[test]
+    // fn part2_min_location() {
+    //     let (seeds, maps) = read_data("./data/test_part2.txt");
+    //     let seed_ranges = get_seed_ranges(&seeds);
+    //     let min_loc_with_ranges = find_min_location_with_ranges(seed_ranges, &maps);
+    //     assert_eq!(min_loc_with_ranges, 46);
+    // }
+
     #[test]
-    fn part2_min_location() {
-        let (seeds, maps) = read_data("./data/test_part2.txt");
-        let seed_ranges = get_seed_ranges(&seeds);
-        let min_loc_with_ranges = find_min_location_with_ranges(seed_ranges, &maps);
-        assert_eq!(min_loc_with_ranges, 46);
+    fn filter_seed_ranges() {
+        let inputs = vec![
+            Range { start: 2, end: 8 },
+            Range { start: 12, end: 22 },
+            Range { start: 34, end: 49 },
+            Range { start: 55, end: 65 },
+        ];
+        let seeds = vec![
+            Range { start: 0, end: 5 },
+            Range { start: 5, end: 16 },
+            Range { start: 16, end: 19 },
+            Range { start: 19, end: 30 },
+            Range { start: 30, end: 38 },
+            Range { start: 38, end: 42 },
+            Range { start: 42, end: 60 },
+            Range { start: 60, end: 65 }, // test for getting this 1-1 interval
+        ];
+        let expected_ranges: Vec<Range<u64>> = vec![
+            Range { start: 2, end: 5 },
+            Range { start: 5, end: 8 },
+            Range { start: 12, end: 16 },
+            Range { start: 16, end: 19 },
+            Range { start: 19, end: 22 },
+            Range { start: 34, end: 38 },
+            Range { start: 38, end: 42 },
+            Range { start: 42, end: 49 },
+            Range { start: 55, end: 60 },
+            Range { start: 60, end: 65 },
+        ];
+        let filtered_ranges = filter_seed_ranges_by_input(&inputs, &seeds);
+        assert_eq!(filtered_ranges, expected_ranges);
     }
 }
