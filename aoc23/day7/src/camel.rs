@@ -107,7 +107,7 @@ impl Hand {
     fn get_type(s: &str) -> HandType {
         let mut freq: HashMap<&u8, u32> = HashMap::new();
         for b in s.as_bytes() {
-            *freq.entry(b).or_insert(1) += 1;
+            *freq.entry(b).or_insert(0) += 1;
         }
         match freq.len() {
             1 => HandType::FiveOfAKind,
