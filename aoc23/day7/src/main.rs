@@ -1,7 +1,40 @@
 mod camel;
-use camel::{Card, Hand, HandType};
 
-fn main() {}
+use camel::{Hand, HandType};
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::Path;
+
+fn main() {
+    let mut hands = read_data("./data/input.txt");
+    let winnings = total_winnings(&mut hands);
+    println!("Day 7, Part 1: {}", winnings);
+}
+
+fn total_winnings(hands: &mut [Hand]) -> u64 {
+    hands.sort();
+    let mut total = 0;
+    for (rank, hand) in hands.iter().enumerate() {
+        total += (rank + 1) as u64 * hand.bid;
+    }
+    total
+}
+
+fn read_data(filepath: &str) -> Vec<Hand> {
+    let path = Path::new(filepath);
+    let file = File::open(path).unwrap();
+    let reader = BufReader::new(file);
+
+    let mut hands: Vec<Hand> = Vec::new();
+    for line in reader.lines() {
+        let line_copy = line.unwrap();
+        let (hand_str, bit_str) = line_copy.split_once(' ').unwrap();
+        let mut hand = Hand::from_str(hand_str).unwrap();
+        hand.set_bid(bit_str.parse::<u64>().unwrap());
+        hands.push(hand);
+    }
+    hands
+}
 
 #[cfg(test)]
 mod tests {
