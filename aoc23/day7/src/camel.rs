@@ -2,21 +2,21 @@ use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display, Formatter, Result};
 
-#[derive(Ord, Eq, PartialOrd, PartialEq)]
+#[derive(Ord, Eq, PartialOrd, PartialEq, Hash, Clone, Copy)]
 pub enum Card {
     A = 12,
     K = 11,
     Q = 10,
-    J = 9,
-    T = 8,
-    Nine = 7,
-    Eight = 6,
-    Seven = 5,
-    Six = 4,
-    Five = 3,
-    Four = 2,
-    Three = 1,
-    Two = 0,
+    T = 9,
+    Nine = 8,
+    Eight = 7,
+    Seven = 6,
+    Six = 5,
+    Five = 4,
+    Four = 3,
+    Three = 2,
+    Two = 1,
+    J = 0,
 }
 
 impl Card {
@@ -96,37 +96,68 @@ impl Hand {
         })
     }
 
-    pub fn set_rank(&mut self, r: u64) {
-        self.rank = r;
-    }
+    // pub fn set_rank(&mut self, r: u64) {
+    //     self.rank = r;
+    // }
 
     pub fn set_bid(&mut self, b: u64) {
         self.bid = b;
     }
 
     fn get_type(s: &str) -> HandType {
-        let mut freq: HashMap<&u8, u32> = HashMap::new();
+        let mut freq: HashMap<Card, u32> = HashMap::new();
         for b in s.as_bytes() {
-            *freq.entry(b).or_insert(0) += 1;
+            *freq.entry(Card::from_byte(*b).unwrap()).or_insert(0) += 1;
         }
-        match freq.len() {
-            1 => HandType::FiveOfAKind,
-            2 => {
-                if freq.values().any(|v| v == &4_u32) {
-                    HandType::FourOfAKind
+
+        // if the length of the frequencies is 1, the hand is highest type
+        if freq.len() == 1 {
+            HandType::FiveOfAKind
+        } else {
+            // get the count of J and add it to the card with highest count
+            // break ties by strongest card
+            let j_count = freq.remove(&Card::J).unwrap_or(0);
+            let highest_card = freq
+                .iter()
+                .max_by(|a, b| {
+                    // if the counts are equal
+                    if a.1 == b.1 {
+                        // compare the cards
+                        a.0.cmp(&b.0)
+                    } else {
+                        a.1.cmp(&b.1)
+                    }
+                })
+                .map(|(k, _v)| k)
+                .unwrap();
+            let mut new_freq: HashMap<&Card, u32> = HashMap::new();
+            for (card, count) in freq.iter() {
+                if card == highest_card {
+                    new_freq.insert(card, *count + j_count);
                 } else {
-                    HandType::FullHouse
+                    new_freq.insert(card, *count);
                 }
             }
-            3 => {
-                if freq.values().any(|v| v == &3_u32) {
-                    HandType::ThreeOfAKind
-                } else {
-                    HandType::TwoPair
+
+            match new_freq.len() {
+                1 => HandType::FiveOfAKind,
+                2 => {
+                    if new_freq.values().any(|v| v == &4_u32) {
+                        HandType::FourOfAKind
+                    } else {
+                        HandType::FullHouse
+                    }
                 }
+                3 => {
+                    if new_freq.values().any(|v| v == &3_u32) {
+                        HandType::ThreeOfAKind
+                    } else {
+                        HandType::TwoPair
+                    }
+                }
+                4 => HandType::OnePair,
+                _ => HandType::HighCard,
             }
-            4 => HandType::OnePair,
-            _ => HandType::HighCard,
         }
     }
 }

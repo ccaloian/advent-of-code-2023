@@ -1,6 +1,6 @@
 mod camel;
 
-use camel::{Hand, HandType};
+use camel::Hand;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -8,7 +8,7 @@ use std::path::Path;
 fn main() {
     let mut hands = read_data("./data/input.txt");
     let winnings = total_winnings(&mut hands);
-    println!("Day 7, Part 1: {}", winnings);
+    println!("Day 7, Part 2: {}", winnings);
 }
 
 fn total_winnings(hands: &mut [Hand]) -> u64 {
@@ -39,6 +39,7 @@ fn read_data(filepath: &str) -> Vec<Hand> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use camel::{Card, Hand, HandType};
 
     #[test]
     fn part1_cards_order() {
@@ -96,5 +97,16 @@ mod tests {
         let hand_1 = Hand::from_str("77888").unwrap();
         let hand_2 = Hand::from_str("77788").unwrap();
         assert!(hand_1 > hand_2);
+    }
+
+    #[test]
+    fn order_with_joker() {
+        let hand_1 = Hand::from_str("JKKK2").unwrap();
+        let hand_2 = Hand::from_str("QQQQ2").unwrap();
+        assert!(hand_1 < hand_2);
+
+        let hand_1 = Hand::from_str("QJJQ2").unwrap();
+        let hand_2 = Hand::from_str("QQJJ2").unwrap();
+        assert!(hand_1 < hand_2);
     }
 }
