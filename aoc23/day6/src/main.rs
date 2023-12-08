@@ -109,9 +109,9 @@ mod tests {
 
     #[test]
     fn part1_get_num_winning() {
-        assert_eq!(get_num_winning(&7, &9), 4);
-        assert_eq!(get_num_winning(&15, &40), 8);
-        assert_eq!(get_num_winning(&30, &200), 9);
+        assert_eq!(get_num_winning_analytically(&7, &9), 4);
+        assert_eq!(get_num_winning_analytically(&15, &40), 8);
+        assert_eq!(get_num_winning_analytically(&30, &200), 9);
     }
 
     #[test]
@@ -124,6 +124,6 @@ mod tests {
     #[test]
     fn part1_product() {
         let (times, dists) = read_data("./data/test_part1.txt");
-        assert_eq!(get_num_winning_all_races(times, dists), 288);
+        assert_eq!(get_num_winning_all_races_analytically(times, dists), 288);
     }
 }
