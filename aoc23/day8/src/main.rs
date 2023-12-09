@@ -17,7 +17,7 @@ fn navigate_steps_simultaneously(
     navigator: Navigator,
     directions: Vec<u8>,
     dest: fn(&str) -> bool,
-) -> Vec<u64> {
+) -> u64 {
     let start_nodes = navigator
         .keys()
         .filter(|k| k.ends_with('A'))
@@ -32,7 +32,26 @@ fn navigate_steps_simultaneously(
         steps_each[i] = steps as u64;
     }
 
-    steps_each
+    lcmm(&steps_each)
+}
+
+fn gcd(x: u64, y: u64) -> u64 {
+    let mut x = x;
+    let mut y = y;
+    while y != 0 {
+        let t = y;
+        y = x % y;
+        x = t;
+    }
+    x
+}
+
+fn lcm(a: u64, b: u64) -> u64 {
+    a * b / gcd(a, b)
+}
+
+fn lcmm(nums: &[u64]) -> u64 {
+    nums.iter().fold(1, |a, b| lcm(a, *b))
 }
 
 fn navigate_steps(
@@ -103,5 +122,19 @@ mod tests {
             process_line("AAA = (BBB, CCC)"),
             ("AAA".to_string(), ("BBB".to_string(), "CCC".to_string()))
         );
+    }
+
+    #[test]
+    fn lcm_works() {
+        assert_eq!(lcm(2, 3), 6);
+        assert_eq!(lcm(12, 4), 12);
+        assert_eq!(lcm(3, 7), 21);
+    }
+
+    #[test]
+    fn lcmm_works() {
+        assert_eq!(lcmm(&[3, 4]), 12);
+        assert_eq!(lcmm(&[3, 4, 6, 8]), 24);
+        assert_eq!(lcmm(&[12, 18, 3, 4, 9, 6]), 36);
     }
 }
