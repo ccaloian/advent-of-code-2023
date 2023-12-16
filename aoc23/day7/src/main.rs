@@ -45,7 +45,7 @@ mod tests {
     fn part1_cards_order() {
         assert!(Card::A > Card::K);
         assert!(Card::Nine > Card::Six);
-        assert!(Card::J > Card::Two);
+        assert!(Card::J < Card::Two);
     }
 
     #[test]
