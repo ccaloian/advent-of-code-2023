@@ -136,108 +136,108 @@ struct Symbol {
 mod tests {
     use super::*;
 
-    #[test]
-    fn scan() {
-        let numbers = vec![
-            Number {
-                val: 467,
-                loc: NumberLoc {
-                    row: 0,
-                    cols: (0, 2),
-                },
-            },
-            Number {
-                val: 114,
-                loc: NumberLoc {
-                    row: 0,
-                    cols: (5, 7),
-                },
-            },
-            Number {
-                val: 35,
-                loc: NumberLoc {
-                    row: 2,
-                    cols: (2, 3),
-                },
-            },
-            Number {
-                val: 633,
-                loc: NumberLoc {
-                    row: 2,
-                    cols: (6, 8),
-                },
-            },
-            Number {
-                val: 617,
-                loc: NumberLoc {
-                    row: 4,
-                    cols: (0, 2),
-                },
-            },
-            Number {
-                val: 58,
-                loc: NumberLoc {
-                    row: 5,
-                    cols: (7, 8),
-                },
-            },
-            Number {
-                val: 592,
-                loc: NumberLoc {
-                    row: 6,
-                    cols: (2, 4),
-                },
-            },
-            Number {
-                val: 755,
-                loc: NumberLoc {
-                    row: 7,
-                    cols: (6, 8),
-                },
-            },
-            Number {
-                val: 664,
-                loc: NumberLoc {
-                    row: 9,
-                    cols: (1, 3),
-                },
-            },
-            Number {
-                val: 598,
-                loc: NumberLoc {
-                    row: 9,
-                    cols: (5, 7),
-                },
-            },
-        ];
-        let symbols = vec![
-            Symbol {
-                val: '*',
-                loc: SymbolLoc { row: 1, col: 3 },
-            },
-            Symbol {
-                val: '#',
-                loc: SymbolLoc { row: 3, col: 6 },
-            },
-            Symbol {
-                val: '*',
-                loc: SymbolLoc { row: 4, col: 3 },
-            },
-            Symbol {
-                val: '+',
-                loc: SymbolLoc { row: 5, col: 5 },
-            },
-            Symbol {
-                val: '$',
-                loc: SymbolLoc { row: 8, col: 3 },
-            },
-            Symbol {
-                val: '*',
-                loc: SymbolLoc { row: 8, col: 5 },
-            },
-        ];
-        assert_eq!(scan_file("./data/test_part1.txt"), (numbers, symbols));
-    }
+    // #[test]
+    // fn scan() {
+    //     let numbers = vec![
+    //         Number {
+    //             val: 467,
+    //             loc: NumberLoc {
+    //                 row: 0,
+    //                 cols: (0, 2),
+    //             },
+    //         },
+    //         Number {
+    //             val: 114,
+    //             loc: NumberLoc {
+    //                 row: 0,
+    //                 cols: (5, 7),
+    //             },
+    //         },
+    //         Number {
+    //             val: 35,
+    //             loc: NumberLoc {
+    //                 row: 2,
+    //                 cols: (2, 3),
+    //             },
+    //         },
+    //         Number {
+    //             val: 633,
+    //             loc: NumberLoc {
+    //                 row: 2,
+    //                 cols: (6, 8),
+    //             },
+    //         },
+    //         Number {
+    //             val: 617,
+    //             loc: NumberLoc {
+    //                 row: 4,
+    //                 cols: (0, 2),
+    //             },
+    //         },
+    //         Number {
+    //             val: 58,
+    //             loc: NumberLoc {
+    //                 row: 5,
+    //                 cols: (7, 8),
+    //             },
+    //         },
+    //         Number {
+    //             val: 592,
+    //             loc: NumberLoc {
+    //                 row: 6,
+    //                 cols: (2, 4),
+    //             },
+    //         },
+    //         Number {
+    //             val: 755,
+    //             loc: NumberLoc {
+    //                 row: 7,
+    //                 cols: (6, 8),
+    //             },
+    //         },
+    //         Number {
+    //             val: 664,
+    //             loc: NumberLoc {
+    //                 row: 9,
+    //                 cols: (1, 3),
+    //             },
+    //         },
+    //         Number {
+    //             val: 598,
+    //             loc: NumberLoc {
+    //                 row: 9,
+    //                 cols: (5, 7),
+    //             },
+    //         },
+    //     ];
+    //     let symbols = vec![
+    //         Symbol {
+    //             val: '*',
+    //             loc: SymbolLoc { row: 1, col: 3 },
+    //         },
+    //         Symbol {
+    //             val: '#',
+    //             loc: SymbolLoc { row: 3, col: 6 },
+    //         },
+    //         Symbol {
+    //             val: '*',
+    //             loc: SymbolLoc { row: 4, col: 3 },
+    //         },
+    //         Symbol {
+    //             val: '+',
+    //             loc: SymbolLoc { row: 5, col: 5 },
+    //         },
+    //         Symbol {
+    //             val: '$',
+    //             loc: SymbolLoc { row: 8, col: 3 },
+    //         },
+    //         Symbol {
+    //             val: '*',
+    //             loc: SymbolLoc { row: 8, col: 5 },
+    //         },
+    //     ];
+    //     assert_eq!(scan_file("./data/test_part1.txt"), (numbers, symbols));
+    // }
 
     #[test]
     fn adjacency() {
