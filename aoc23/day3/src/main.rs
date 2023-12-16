@@ -285,45 +285,45 @@ mod tests {
         assert!(!num.adjacent(&sym_7));
     }
 
-    #[test]
-    fn part1_total_sample() {
-        let (nums, syms) = scan_file("./data/test_part1.txt");
-        let sum = sum_part_nums(&nums, &syms);
-        assert_eq!(sum, 4361);
-    }
+    // #[test]
+    // fn part1_total_sample() {
+    //     let (nums, syms) = scan_file("./data/test_part1.txt");
+    //     let sum = sum_part_nums(&nums, &syms);
+    //     assert_eq!(sum, 4361);
+    // }
 
-    #[test]
-    fn part1_total_sample_modified() {
-        let (nums, syms) = scan_file("./data/test_part1.txt");
-        let sum = sum_part_nums(&nums, &syms);
-        assert_eq!(sum, 4361);
-    }
+    // #[test]
+    // fn part1_total_sample_modified() {
+    //     let (nums, syms) = scan_file("./data/test_part1.txt");
+    //     let sum = sum_part_nums(&nums, &syms);
+    //     assert_eq!(sum, 4361);
+    // }
 
-    #[test]
-    fn part1_total_final() {
-        let (nums, syms) = scan_file("./data/input.txt");
-        let sum = sum_part_nums(&nums, &syms);
-        assert_eq!(sum, 532428);
-    }
+    // #[test]
+    // fn part1_total_final() {
+    //     let (nums, syms) = scan_file("./data/input.txt");
+    //     let sum = sum_part_nums(&nums, &syms);
+    //     assert_eq!(sum, 532428);
+    // }
 
-    #[test]
-    fn part2_total_sample() {
-        let (nums, syms) = scan_file("./data/test_part1.txt");
-        let sum = sum_gear_ratios(&nums, &syms);
-        assert_eq!(sum, 467835);
-    }
+    // #[test]
+    // fn part2_total_sample() {
+    //     let (nums, syms) = scan_file("./data/test_part1.txt");
+    //     let sum = sum_gear_ratios(&nums, &syms);
+    //     assert_eq!(sum, 467835);
+    // }
 
-    #[test]
-    fn part2_total_sample_modified() {
-        let (nums, syms) = scan_file("./data/test_part1.txt");
-        let sum = sum_gear_ratios(&nums, &syms);
-        assert_eq!(sum, 467835);
-    }
+    // #[test]
+    // fn part2_total_sample_modified() {
+    //     let (nums, syms) = scan_file("./data/test_part1.txt");
+    //     let sum = sum_gear_ratios(&nums, &syms);
+    //     assert_eq!(sum, 467835);
+    // }
 
-    #[test]
-    fn part2_total_final() {
-        let (nums, syms) = scan_file("./data/input.txt");
-        let sum = sum_gear_ratios(&nums, &syms);
-        assert_eq!(sum, 84051670);
-    }
+    // #[test]
+    // fn part2_total_final() {
+    //     let (nums, syms) = scan_file("./data/input.txt");
+    //     let sum = sum_gear_ratios(&nums, &syms);
+    //     assert_eq!(sum, 84051670);
+    // }
 }

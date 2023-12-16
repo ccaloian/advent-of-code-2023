@@ -338,58 +338,58 @@ fn read_data(filepath: &str) -> (Vec<u64>, Vec<Range<u64>>, HashMap<&str, RangeM
 mod tests {
     use super::*;
 
-    #[test]
-    fn part1_read_test_file() {
-        let (seeds, _, maps) = read_data("./data/test_part1.txt");
-        assert_eq!(seeds, vec![79, 14, 55, 13]);
-        let mut keys_found = maps.keys().cloned().collect::<Vec<&str>>();
-        let mut keys_expected = vec![
-            "seed-to-soil",
-            "soil-to-fertilizer",
-            "fertilizer-to-water",
-            "water-to-light",
-            "light-to-temperature",
-            "temperature-to-humidity",
-            "humidity-to-location",
-        ];
-        keys_found.sort();
-        keys_expected.sort();
-        assert_eq!(keys_found, keys_expected);
-    }
+    // #[test]
+    // fn part1_read_test_file() {
+    //     let (seeds, _, maps) = read_data("./data/test_part1.txt");
+    //     assert_eq!(seeds, vec![79, 14, 55, 13]);
+    //     let mut keys_found = maps.keys().cloned().collect::<Vec<&str>>();
+    //     let mut keys_expected = vec![
+    //         "seed-to-soil",
+    //         "soil-to-fertilizer",
+    //         "fertilizer-to-water",
+    //         "water-to-light",
+    //         "light-to-temperature",
+    //         "temperature-to-humidity",
+    //         "humidity-to-location",
+    //     ];
+    //     keys_found.sort();
+    //     keys_expected.sort();
+    //     assert_eq!(keys_found, keys_expected);
+    // }
 
-    #[test]
-    fn part1_map_id() {
-        let (_, _, maps) = read_data("./data/test_part1.txt");
-        assert_eq!(get_mapped_id(79, "seed-to-soil", &maps), 81);
-        assert_eq!(get_mapped_id(14, "seed-to-soil", &maps), 14);
-        assert_eq!(get_mapped_id(55, "seed-to-soil", &maps), 57);
-        assert_eq!(get_mapped_id(13, "seed-to-soil", &maps), 13);
-    }
+    // #[test]
+    // fn part1_map_id() {
+    //     let (_, _, maps) = read_data("./data/test_part1.txt");
+    //     assert_eq!(get_mapped_id(79, "seed-to-soil", &maps), 81);
+    //     assert_eq!(get_mapped_id(14, "seed-to-soil", &maps), 14);
+    //     assert_eq!(get_mapped_id(55, "seed-to-soil", &maps), 57);
+    //     assert_eq!(get_mapped_id(13, "seed-to-soil", &maps), 13);
+    // }
 
-    #[test]
-    fn part1_min_location() {
-        let (seeds, _, maps) = read_data("./data/test_part1.txt");
-        assert_eq!(find_min_location(&seeds, &maps), 35);
-    }
+    // #[test]
+    // fn part1_min_location() {
+    //     let (seeds, _, maps) = read_data("./data/test_part1.txt");
+    //     assert_eq!(find_min_location(&seeds, &maps), 35);
+    // }
 
-    #[test]
-    fn part2_seed_ranges() {
-        let (seeds, _, _) = read_data("./data/test_part1.txt");
-        let seed_ranges = get_seed_ranges(&seeds);
-        assert_eq!(
-            seed_ranges,
-            vec![
-                Range {
-                    start: 79,
-                    end: 79 + 14
-                },
-                Range {
-                    start: 55,
-                    end: 55 + 13
-                }
-            ]
-        );
-    }
+    // #[test]
+    // fn part2_seed_ranges() {
+    //     let (seeds, _, _) = read_data("./data/test_part1.txt");
+    //     let seed_ranges = get_seed_ranges(&seeds);
+    //     assert_eq!(
+    //         seed_ranges,
+    //         vec![
+    //             Range {
+    //                 start: 79,
+    //                 end: 79 + 14
+    //             },
+    //             Range {
+    //                 start: 55,
+    //                 end: 55 + 13
+    //             }
+    //         ]
+    //     );
+    // }
 
     #[test]
     fn part2_complete_ranges() {

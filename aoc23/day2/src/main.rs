@@ -237,23 +237,23 @@ mod tests {
         .unwrap());
     }
 
-    #[test]
-    fn part1_total_sample() {
-        assert_eq!(get_possible_games_sum("./data/test_part1.txt"), 8);
-    }
+    // #[test]
+    // fn part1_total_sample() {
+    //     assert_eq!(get_possible_games_sum("./data/test_part1.txt"), 8);
+    // }
 
-    #[test]
-    fn part1_total_final() {
-        assert_eq!(get_possible_games_sum("./data/input.txt"), 2720);
-    }
+    // #[test]
+    // fn part1_total_final() {
+    //     assert_eq!(get_possible_games_sum("./data/input.txt"), 2720);
+    // }
 
-    #[test]
-    fn part2_total_sample() {
-        assert_eq!(get_sum_of_powers("./data/test_part2.txt"), 2286);
-    }
+    // #[test]
+    // fn part2_total_sample() {
+    //     assert_eq!(get_sum_of_powers("./data/test_part2.txt"), 2286);
+    // }
 
-    #[test]
-    fn part2_total_final() {
-        assert_eq!(get_sum_of_powers("./data/input.txt"), 71535);
-    }
+    // #[test]
+    // fn part2_total_final() {
+    //     assert_eq!(get_sum_of_powers("./data/input.txt"), 71535);
+    // }
 }

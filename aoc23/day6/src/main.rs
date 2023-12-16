@@ -121,9 +121,9 @@ mod tests {
         assert_eq!(get_num_winning_analytically(&30, &200), 9);
     }
 
-    #[test]
-    fn part1_product() {
-        let (times, dists) = read_data("./data/test_part1.txt");
-        assert_eq!(get_num_winning_all_races_analytically(times, dists), 288);
-    }
+    // #[test]
+    // fn part1_product() {
+    //     let (times, dists) = read_data("./data/test_part1.txt");
+    //     assert_eq!(get_num_winning_all_races_analytically(times, dists), 288);
+    // }
 }

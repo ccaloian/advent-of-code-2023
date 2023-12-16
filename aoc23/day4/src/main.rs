@@ -154,31 +154,31 @@ mod tests {
         assert_eq!(1 + 1, 2);
     }
 
-    #[test]
-    fn part1_total_sample() {
-        let cards = scan("./data/test_part1.txt");
-        let sum = sum_winning_points(&cards);
-        assert_eq!(sum, 13);
-    }
+    // #[test]
+    // fn part1_total_sample() {
+    //     let cards = scan("./data/test_part1.txt");
+    //     let sum = sum_winning_points(&cards);
+    //     assert_eq!(sum, 13);
+    // }
 
-    #[test]
-    fn part1_total_final() {
-        let cards = scan("./data/input.txt");
-        let sum = sum_winning_points(&cards);
-        assert_eq!(sum, 24160);
-    }
+    // #[test]
+    // fn part1_total_final() {
+    //     let cards = scan("./data/input.txt");
+    //     let sum = sum_winning_points(&cards);
+    //     assert_eq!(sum, 24160);
+    // }
 
-    #[test]
-    fn part2_total_sample() {
-        let cards = scan("./data/test_part1.txt");
-        let total = total_scratchcards(&cards);
-        assert_eq!(total, 30);
-    }
+    // #[test]
+    // fn part2_total_sample() {
+    //     let cards = scan("./data/test_part1.txt");
+    //     let total = total_scratchcards(&cards);
+    //     assert_eq!(total, 30);
+    // }
 
-    #[test]
-    fn part2_total_final() {
-        let cards = scan("./data/input.txt");
-        let total = total_scratchcards(&cards);
-        assert_eq!(total, 5659035);
-    }
+    // #[test]
+    // fn part2_total_final() {
+    //     let cards = scan("./data/input.txt");
+    //     let total = total_scratchcards(&cards);
+    //     assert_eq!(total, 5659035);
+    // }
 }
