@@ -9,8 +9,11 @@ use std::path::Path;
 
 fn main() {
     let map = read_data("./data/input.txt");
-    let total_energized_tiles = part_1(&map);
+    let total_energized_tiles = part_1(0, 0, Direction::Right, &map);
     println!("Day 16, Part 1: {:?}", total_energized_tiles);
+
+    let max_energized_tiles = part2(&map);
+    println!("Day 16, Part 2: {:?}", max_energized_tiles);
 }
 
 type Map = Vec<Vec<Tile>>;
@@ -201,43 +204,39 @@ fn rand_id() -> String {
         .collect()
 }
 
-fn part_1(map: &Map) -> usize {
+fn part_1(x: i32, y: i32, direction: Direction, map: &Map) -> usize {
     let mut beams: VecDeque<Beam> = VecDeque::new();
-    beams.push_back(Beam::new(0, 0, map[0][0], Direction::Right));
+    beams.push_back(Beam::new(x, y, map[x as usize][y as usize], direction));
 
     let mut splits: HashSet<(usize, usize)> = HashSet::new();
-
     let mut energized_tiles: HashSet<(usize, usize)> = HashSet::new();
 
     while !beams.is_empty() {
-        println!("Num active beams: {}", beams.len());
         let mut beam = beams.pop_front().unwrap();
-        println!("Num active beams after pop_front: {}", beams.len());
         loop {
-            println!(
-                "{} ({},{}) {} {} [{}, {}]",
-                beam.id,
-                beam.x,
-                beam.y,
-                beam.tile,
-                beam.direction,
-                beam.seen.len(),
-                beam.completed
-            );
             beam.update(&mut beams, &mut splits, map);
-            println!("Num active beams after update: {}", beams.len());
             if beam.completed {
                 energized_tiles.extend(beam.seen.iter());
-                println!(
-                    "Beam {} completed, total energized tiles: {}",
-                    beam.id,
-                    energized_tiles.len()
-                );
                 break;
             }
         }
     }
     energized_tiles.len()
+}
+
+fn part2(map: &Map) -> usize {
+    let (nrow, ncol) = (map.len(), map[0].len());
+
+    let mut num_energized: Vec<usize> = Vec::new();
+    for row in 0..nrow {
+        num_energized.push(part_1(0, row as i32, Direction::Right, map));
+        num_energized.push(part_1(ncol as i32 - 1, row as i32, Direction::Left, map));
+    }
+    for col in 0..ncol {
+        num_energized.push(part_1(col as i32, 0, Direction::Down, map));
+        num_energized.push(part_1(col as i32, nrow as i32 - 1, Direction::Up, map));
+    }
+    *num_energized.iter().max().unwrap()
 }
 
 fn read_data(filepath: &str) -> Map {
