@@ -77,44 +77,19 @@ impl FromStr for Rating {
             .split(',')
             .collect::<Vec<&str>>();
 
-        // let scores = ratings.into_iter().map(|s| s.split_once('=')
-        //     .unwrap()
-        //     .1
-        //     .parse::<u64>()
-        //     .map_err(|_| ParseRatingError)?)
-        //     .collect()
-
-        let x_str = ratings[0]
-            .split_once('=')
-            .unwrap()
-            .1
-            .parse::<u64>()
-            .map_err(|_| ParseRatingError)?;
-        let m_str = ratings[1]
-            .split_once('=')
-            .unwrap()
-            .1
-            .parse::<u64>()
-            .map_err(|_| ParseRatingError)?;
-        let a_str = ratings[2]
-            .split_once('=')
-            .unwrap()
-            .1
-            .parse::<u64>()
-            .map_err(|_| ParseRatingError)?;
-        let s_str = ratings[3]
-            .split_once('=')
-            .unwrap()
-            .1
-            .parse::<u64>()
-            .map_err(|_| ParseRatingError)?;
-
-        Ok(Rating {
-            x: x_str,
-            m: m_str,
-            a: a_str,
-            s: s_str,
-        })
+        let scores = ratings
+            .into_iter()
+            .map(|s| s.split_once('=').unwrap().1.parse::<u64>())
+            .collect::<Result<Vec<_>, std::num::ParseIntError>>();
+        match scores {
+            Ok(v) => Ok(Rating {
+                x: v[0],
+                m: v[1],
+                a: v[2],
+                s: v[3],
+            }),
+            Err(_e) => Err(ParseRatingError),
+        }
     }
 }
 
